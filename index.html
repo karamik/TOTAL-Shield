@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="TOTAL Shield — hardware-verifiable execution integrity for sovereign AI. Protection against voltage glitching, EM side-channels, and bus tampering.">
+    <meta name="keywords" content="TOTAL Shield, execution integrity, sovereign AI, voltage glitching, side-channel attack, FPGA, UCIe, Ascon, hardware security">
+    <meta property="og:title" content="TOTAL Shield — Hardware-Verifiable Execution Integrity for AI Inference">
+    <meta property="og:description" content="Protect AI models from physical attacks with <10 ms detection, 2.6% latency overhead, and zero software footprint.">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="https://via.placeholder.com/1200x630?text=TOTAL+Shield">
+    <meta name="twitter:card" content="summary_large_image">
+    <title>TOTAL Shield — Hardware-Verifiable Execution Integrity for AI Inference</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #111118;
+            --bg-card: #16161f;
+            --bg-card-hover: #1c1c28;
+            --border: #2a2a3a;
+            --border-hover: #3a3a50;
+            --text-primary: #f0f0f5;
+            --text-secondary: #a0a0b5;  /* increased contrast */
+            --text-muted: #6a6a85;
+            --accent: #00d4aa;
+            --accent-dim: #00d4aa20;
+            --accent-glow: #00d4aa40;
+            --danger: #ff4757;
+            --danger-glow: #ff475740;
+            --warning: #ffa502;
+            --info: #3498db;
+            --gradient-1: #00d4aa;
+            --gradient-2: #00b4d8;
+            --gradient-3: #0077b6;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Particles – reduced count and optimized */
+        .bg-particles {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 0; opacity: 0.4;
+        }
+        .particle {
+            position: absolute; width: 2px; height: 2px;
+            background: var(--accent); border-radius: 50%;
+            animation: float 15s infinite;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0) translateX(0); opacity: 0; }
+            10% { opacity: 1; } 90% { opacity: 1; }
+            100% { transform: translateY(-100vh) translateX(50px); opacity: 0; }
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+            background: rgba(10, 10, 15, 0.8); backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border); padding: 0 2rem;
+            transition: background 0.3s;
+        }
+        .nav-container {
+            max-width: 1400px; margin: 0 auto;
+            display: flex; justify-content: space-between; align-items: center; height: 64px;
+        }
+        .logo {
+            display: flex; align-items: center; gap: 12px;
+            font-weight: 800; font-size: 1.2rem; color: var(--text-primary); text-decoration: none;
+        }
+        .logo-icon {
+            width: 36px; height: 36px;
+            background: linear-gradient(135deg, var(--gradient-1), var(--gradient-2));
+            border-radius: 10px; display: flex; align-items: center; justify-content: center;
+            font-size: 1.1rem;
+        }
+        .nav-links { display: flex; gap: 2rem; list-style: none; }
+        .nav-links a {
+            color: var(--text-secondary); text-decoration: none; font-size: 0.9rem;
+            font-weight: 500; transition: color 0.3s; position: relative;
+        }
+        .nav-links a:hover { color: var(--accent); }
+        .nav-links a::after {
+            content: ''; position: absolute; bottom: -4px; left: 0;
+            width: 0; height: 2px; background: var(--accent); transition: width 0.3s;
+        }
+        .nav-links a:hover::after { width: 100%; }
+        .nav-cta {
+            background: linear-gradient(135deg, var(--gradient-1), var(--gradient-2));
+            color: var(--bg-primary) !important; padding: 0.5rem 1.25rem;
+            border-radius: 8px; font-weight: 600;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .nav-cta:hover {
+            transform: translateY(-2px); box-shadow: 0 8px 25px var(--accent-glow);
+        }
+        .nav-cta::after { display: none !important; }
+
+        /* Hamburger menu */
+        .hamburger {
+            display: none; flex-direction: column; cursor: pointer;
+            gap: 5px; background: transparent; border: none;
+        }
+        .hamburger span {
+            width: 25px; height: 2px; background: var(--text-primary);
+            transition: 0.3s; border-radius: 2px;
+        }
+        .mobile-menu {
+            position: fixed; top: 64px; left: 0; right: 0;
+            background: rgba(10, 10, 15, 0.98); backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border); padding: 1.5rem;
+            transform: translateY(-100%); opacity: 0; transition: 0.3s;
+            z-index: 999; display: flex; flex-direction: column; gap: 1rem;
+        }
+        .mobile-menu.open {
+            transform: translateY(0); opacity: 1;
+        }
+        .mobile-menu a {
+            color: var(--text-secondary); text-decoration: none; font-size: 1.1rem;
+            font-weight: 500; padding: 0.5rem 0; border-bottom: 1px solid var(--border);
+        }
+        .mobile-menu a:hover { color: var(--accent); }
+
+        .hero {
+            position: relative; min-height: 100vh;
+            display: flex; align-items: center; justify-content: center;
+            padding: 120px 2rem 80px; overflow: hidden;
+        }
+        .hero-bg {
+            position: absolute; inset: 0; z-index: 1;
+            background:
+                radial-gradient(ellipse at 20% 50%, rgba(0, 212, 170, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 50%, rgba(0, 180, 216, 0.06) 0%, transparent 50%);
+        }
+        .hero-grid {
+            position: absolute; inset: 0; z-index: 1;
+            background-image:
+                linear-gradient(rgba(0, 212, 170, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 212, 170, 0.03) 1px, transparent 1px);
+            background-size: 60px 60px;
+            mask-image: radial-gradient(ellipse at center, black 30%, transparent 70%);
+        }
+        .hero-content { position: relative; z-index: 2; max-width: 1000px; text-align: center; }
+        .hero-badge {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: var(--accent-dim); border: 1px solid var(--accent);
+            color: var(--accent); padding: 0.5rem 1rem; border-radius: 100px;
+            font-size: 0.85rem; font-weight: 600; margin-bottom: 2rem;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 0 0 var(--accent-glow); }
+            50% { box-shadow: 0 0 20px 5px var(--accent-glow); }
+        }
+        .hero-badge .dot {
+            width: 8px; height: 8px; background: var(--accent);
+            border-radius: 50%; animation: blink 1.5s infinite;
+        }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+        .hero h1 {
+            font-size: clamp(2.5rem, 6vw, 4.5rem); font-weight: 900; line-height: 1.1;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent) 50%, var(--gradient-2) 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+        }
+        .hero-subtitle {
+            font-size: clamp(1.1rem, 2.5vw, 1.4rem); color: var(--text-secondary);
+            max-width: 700px; margin: 0 auto 2.5rem; font-weight: 400;
+        }
+        .hero-cta-group { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+        .btn {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 1rem 2rem; border-radius: 12px; font-weight: 600;
+            font-size: 1rem; text-decoration: none; transition: all 0.3s;
+            cursor: pointer; border: none;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--gradient-1), var(--gradient-2));
+            color: var(--bg-primary); box-shadow: 0 4px 20px var(--accent-glow);
+        }
+        .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 8px 30px var(--accent-glow); }
+        .btn-secondary {
+            background: var(--bg-card); color: var(--text-primary); border: 1px solid var(--border);
+        }
+        .btn-secondary:hover {
+            background: var(--bg-card-hover); border-color: var(--border-hover);
+            transform: translateY(-3px);
+        }
+        .hero-stats {
+            display: flex; justify-content: center; gap: 3rem;
+            margin-top: 4rem; flex-wrap: wrap;
+        }
+        .stat { text-align: center; }
+        .stat-value {
+            font-size: 2.5rem; font-weight: 800; color: var(--accent);
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .stat-label { font-size: 0.85rem; color: var(--text-muted); margin-top: 0.25rem; }
+
+        section { position: relative; z-index: 2; padding: 100px 2rem; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .section-header { text-align: center; margin-bottom: 4rem; }
+        .section-label {
+            display: inline-block; color: var(--accent); font-size: 0.85rem;
+            font-weight: 700; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 1rem;
+        }
+        .section-title { font-size: clamp(2rem, 4vw, 3rem); font-weight: 800; margin-bottom: 1rem; }
+        .section-desc { color: var(--text-secondary); max-width: 600px; margin: 0 auto; font-size: 1.1rem; }
+
+        .features-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;
+        }
+        .feature-card {
+            background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px;
+            padding: 2rem; transition: all 0.4s; position: relative; overflow: hidden;
+        }
+        .feature-card::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+            background: linear-gradient(90deg, var(--gradient-1), var(--gradient-2));
+            transform: scaleX(0); transition: transform 0.4s;
+        }
+        .feature-card:hover {
+            background: var(--bg-card-hover); border-color: var(--border-hover);
+            transform: translateY(-5px); box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+        .feature-card:hover::before { transform: scaleX(1); }
+        .feature-icon {
+            width: 48px; height: 48px; background: var(--accent-dim); border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.5rem; margin-bottom: 1.25rem;
+        }
+        .feature-card h3 { font-size: 1.2rem; font-weight: 700; margin-bottom: 0.75rem; }
+        .feature-card p { color: var(--text-secondary); font-size: 0.95rem; line-height: 1.6; }
+        .feature-highlight {
+            display: inline-block; background: var(--accent-dim); color: var(--accent);
+            padding: 0.25rem 0.75rem; border-radius: 6px; font-size: 0.8rem;
+            font-weight: 600; margin-top: 1rem;
+        }
+
+        .attack-section { background: var(--bg-secondary); }
+        .attack-container { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: center; }
+        .attack-visual {
+            position: relative; background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: 20px; padding: 2rem; overflow: hidden;
+        }
+        @media (prefers-reduced-motion: no-preference) {
+            .attack-visual::before {
+                content: ''; position: absolute; top: -50%; left: -50%;
+                width: 200%; height: 200%;
+                background: conic-gradient(from 0deg, transparent, var(--danger-glow), transparent 30%);
+                animation: rotate 4s linear infinite;
+            }
+        }
+        @keyframes rotate { 100% { transform: rotate(360deg); } }
+        .attack-visual-inner { position: relative; background: var(--bg-card); border-radius: 16px; padding: 2rem; z-index: 1; }
+        .attack-step {
+            display: flex; align-items: center; gap: 1rem; padding: 1rem;
+            margin-bottom: 0.75rem; background: rgba(255, 71, 87, 0.05);
+            border: 1px solid rgba(255, 71, 87, 0.1); border-radius: 12px; transition: all 0.3s;
+        }
+        .attack-step:hover { background: rgba(255, 71, 87, 0.1); transform: translateX(5px); }
+        .attack-step-number {
+            width: 32px; height: 32px; background: var(--danger); color: white;
+            border-radius: 8px; display: flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: 0.9rem; flex-shrink: 0;
+        }
+        .attack-step-text { font-size: 0.9rem; color: var(--text-secondary); }
+        .attack-step-text strong { color: var(--text-primary); }
+        .attack-result {
+            margin-top: 1.5rem; padding: 1.5rem;
+            background: linear-gradient(135deg, rgba(255, 71, 87, 0.1), rgba(255, 71, 87, 0.05));
+            border: 1px solid rgba(255, 71, 87, 0.2); border-radius: 12px; text-align: center;
+        }
+        .attack-result-label {
+            font-size: 0.8rem; color: var(--danger); font-weight: 700;
+            text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.5rem;
+        }
+        .attack-result-value { font-size: 1.5rem; font-weight: 800; color: var(--danger); }
+        .attack-info h3 {
+            font-size: 2rem; font-weight: 800; margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--text-primary), var(--danger));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .attack-info p { color: var(--text-secondary); margin-bottom: 1.5rem; font-size: 1.05rem; }
+        .code-block {
+            background: #0d0d12; border: 1px solid var(--border); border-radius: 12px;
+            padding: 1.25rem; font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem; color: var(--text-secondary); overflow-x: auto; margin-bottom: 1.5rem;
+        }
+        .code-block .comment { color: var(--text-muted); }
+        .code-block .keyword { color: var(--accent); }
+        .code-block .string { color: var(--warning); }
+        .code-block .number { color: var(--info); }
+
+        .business-table { width: 100%; border-collapse: separate; border-spacing: 0; margin-top: 2rem; }
+        .business-table th {
+            background: var(--bg-card); color: var(--accent); font-weight: 700;
+            text-align: left; padding: 1rem 1.5rem; border-bottom: 2px solid var(--accent);
+            font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px;
+        }
+        .business-table td { padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border); color: var(--text-secondary); }
+        .business-table tr:hover td { background: var(--bg-card-hover); color: var(--text-primary); }
+        .business-table tr:last-child td { border-bottom: none; }
+        .revenue-highlight {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--accent-dim), rgba(0, 180, 216, 0.1));
+            color: var(--accent); padding: 0.5rem 1rem; border-radius: 8px;
+            font-weight: 700; font-size: 1.1rem;
+        }
+
+        .roadmap { position: relative; padding-left: 2rem; }
+        .roadmap::before {
+            content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 2px;
+            background: linear-gradient(180deg, var(--gradient-1), var(--gradient-2), var(--gradient-3));
+        }
+        .roadmap-item { position: relative; padding: 1.5rem 0 1.5rem 2rem; border-bottom: 1px solid var(--border); }
+        .roadmap-item::before {
+            content: ''; position: absolute; left: -2rem; top: 2rem;
+            width: 12px; height: 12px; background: var(--bg-primary);
+            border: 3px solid var(--accent); border-radius: 50%; transform: translateX(-5px);
+        }
+        .roadmap-item:last-child { border-bottom: none; }
+        .roadmap-date {
+            display: inline-block; background: var(--accent-dim); color: var(--accent);
+            padding: 0.25rem 0.75rem; border-radius: 6px; font-size: 0.8rem;
+            font-weight: 700; margin-bottom: 0.5rem;
+        }
+        .roadmap-title { font-size: 1.2rem; font-weight: 700; margin-bottom: 0.5rem; }
+        .roadmap-desc { color: var(--text-secondary); font-size: 0.95rem; }
+        .roadmap-partner {
+            display: inline-flex; align-items: center; gap: 6px;
+            margin-top: 0.75rem; color: var(--text-muted); font-size: 0.85rem;
+        }
+
+        .repo-tree {
+            background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px;
+            padding: 2rem; font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; line-height: 2;
+        }
+        .tree-line { display: flex; align-items: center; gap: 0.5rem; padding: 0.25rem 0; flex-wrap: wrap; }
+        .tree-icon { color: var(--accent); }
+        .tree-folder { color: var(--warning); }
+        .tree-file { color: var(--text-secondary); }
+        .tree-comment { color: var(--text-muted); margin-left: 1rem; }
+        .tree-indent { margin-left: 2rem; }
+
+        .contact-section { background: var(--bg-secondary); text-align: center; }
+        .contact-email {
+            display: inline-flex; align-items: center; gap: 12px;
+            background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px;
+            padding: 1.25rem 2rem; margin: 2rem 0;
+            font-family: 'JetBrains Mono', monospace; font-size: 1.1rem;
+            color: var(--accent); text-decoration: none; transition: all 0.3s;
+        }
+        .contact-email:hover {
+            border-color: var(--accent); box-shadow: 0 0 30px var(--accent-glow);
+            transform: translateY(-2px);
+        }
+        .contact-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem; margin-top: 3rem;
+        }
+        .contact-card {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: 12px; padding: 1.5rem; text-align: left;
+        }
+        .contact-card h4 {
+            color: var(--accent); font-size: 0.85rem;
+            text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.5rem;
+        }
+        .contact-card p { color: var(--text-secondary); font-size: 0.95rem; }
+        .github-link {
+            margin-top: 2rem; text-align: center;
+        }
+        .github-link a {
+            display: inline-flex; align-items: center; gap: 10px;
+            background: var(--bg-card); border: 1px solid var(--border); border-radius: 40px;
+            padding: 0.75rem 1.5rem; color: var(--text-primary); text-decoration: none;
+            transition: all 0.3s; font-weight: 500;
+        }
+        .github-link a:hover {
+            border-color: var(--accent); transform: translateY(-2px);
+            box-shadow: 0 5px 20px var(--accent-glow);
+        }
+
+        footer {
+            background: var(--bg-primary); border-top: 1px solid var(--border);
+            padding: 3rem 2rem; text-align: center;
+        }
+        .footer-quote {
+            font-size: 1.3rem; font-weight: 300; font-style: italic;
+            color: var(--text-secondary); max-width: 700px; margin: 0 auto 2rem;
+        }
+        .footer-quote strong { color: var(--accent); font-weight: 700; }
+        .footer-copy { color: var(--text-muted); font-size: 0.9rem; margin-top: 1rem; }
+
+        .fade-in { opacity: 0; transform: translateY(30px); transition: opacity 0.6s, transform 0.6s; }
+        .fade-in.visible { opacity: 1; transform: translateY(0); }
+
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .hamburger { display: flex; }
+            .attack-container { grid-template-columns: 1fr; }
+            .hero-stats { gap: 1.5rem; }
+            .stat-value { font-size: 1.8rem; }
+            section { padding: 60px 1rem; }
+            .tree-indent { margin-left: 1rem; }
+            .tree-line { flex-wrap: wrap; }
+        }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-primary); }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--border-hover); }
+    </style>
+</head>
+<body>
+    <div class="bg-particles" id="particles"></div>
+
+    <nav>
+        <div class="nav-container">
+            <a href="#" class="logo" aria-label="Home">
+                <div class="logo-icon" aria-hidden="true">🛡️</div>
+                <span>TOTAL Shield</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="#features">Features</a></li>
+                <li><a href="#attack">PoC Attack</a></li>
+                <li><a href="#business">Business</a></li>
+                <li><a href="#roadmap">Roadmap</a></li>
+                <li><a href="#contact" class="nav-cta">Contact</a></li>
+            </ul>
+            <button class="hamburger" aria-label="Menu" aria-expanded="false">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+        <div class="mobile-menu" id="mobileMenu">
+            <a href="#features">Features</a>
+            <a href="#attack">PoC Attack</a>
+            <a href="#business">Business</a>
+            <a href="#roadmap">Roadmap</a>
+            <a href="#contact">Contact</a>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <div class="hero-bg"></div>
+        <div class="hero-grid"></div>
+        <div class="hero-content">
+            <div class="hero-badge">
+                <span class="dot"></span>
+                First commercially-ready Execution Integrity solution
+            </div>
+            <h1>Execution Integrity<br>for Sovereign AI</h1>
+            <p class="hero-subtitle">
+                Hardware-verifiable execution integrity for AI models running on untrusted infrastructure.
+                Protection from physical attacks that bypass all software defenses.
+            </p>
+            <div class="hero-cta-group">
+                <a href="#features" class="btn btn-primary" aria-label="Explore Technology">
+                    <span aria-hidden="true">🔍</span> Explore Technology
+                </a>
+                <a href="mailto:totalprotocol@proton.me" class="btn btn-secondary" aria-label="Request Pilot">
+                    <span aria-hidden="true">📧</span> Request Pilot
+                </a>
+            </div>
+            <div class="hero-stats">
+                <div class="stat">
+                    <div class="stat-value">2.6%</div>
+                    <div class="stat-label">Latency vs 14-18% for CXL IDE</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value">&lt;10 ms</div>
+                    <div class="stat-label">Attack detection time</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value">&lt;0.5%</div>
+                    <div class="stat-label">False positive rate</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value">0</div>
+                    <div class="stat-label">Software footprint</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="features">
+        <div class="container">
+            <div class="section-header fade-in">
+                <div class="section-label">Technology</div>
+                <h2 class="section-title">Protection Architecture</h2>
+                <p class="section-desc">
+                    Combining a lightweight bus integrity module with a physically isolated FPGA-based attack detector
+                </p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card fade-in">
+                    <div class="feature-icon" aria-hidden="true">🔐</div>
+                    <h3>Bus Integrity</h3>
+                    <p>Ascon-128a authenticated encryption, 256-byte flits, zero header overhead, dynamic key rotation.</p>
+                    <span class="feature-highlight">TOTAL/CRC-256B for UCIe 2.0</span>
+                </div>
+                <div class="feature-card fade-in">
+                    <div class="feature-icon" aria-hidden="true">🌡️</div>
+                    <h3>Physical Attack Detection</h3>
+                    <p>Temperature grid + EM probe, TinyML classifier on FPGA. Detects glitching, EM sniffing, and bus tampering.</p>
+                    <span class="feature-highlight">&lt;10 ms latency</span>
+                </div>
+                <div class="feature-card fade-in">
+                    <div class="feature-icon" aria-hidden="true">🌍</div>
+                    <h3>Climate Resilient</h3>
+                    <p>Operates in desert conditions up to +50°C. Adaptive thresholds to minimize false positives.</p>
+                    <span class="feature-highlight">&lt;0.5% false positive</span>
+                </div>
+                <div class="feature-card fade-in">
+                    <div class="feature-icon" aria-hidden="true">🚫</div>
+                    <h3>Zero Software Footprint</h3>
+                    <p>No PCIe BAR, no network access — cannot be disabled remotely. Updates only via physical key-switch or authenticated JTAG with hardware token.</p>
+                    <span class="feature-highlight">Hardware Isolation</span>
+                </div>
+                <div class="feature-card fade-in">
+                    <div class="feature-icon" aria-hidden="true">⚡</div>
+                    <h3>Minimal Overhead</h3>
+                    <p>Only 2.6% latency vs 14-18% for CXL IDE. Optimized implementation for minimal performance impact.</p>
+                    <span class="feature-highlight">5-7x better than CXL IDE</span>
+                </div>
+                <div class="feature-card fade-in">
+                    <div class="feature-icon" aria-hidden="true">🏛️</div>
+                    <h3>Sovereign AI</h3>
+                    <p>Built for government clouds, chiplet/GPU manufacturers, and critical infrastructure. UAE national certification ready.</p>
+                    <span class="feature-highlight">Core42 / G42 pilot</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="attack" class="attack-section">
+        <div class="container">
+            <div class="section-header fade-in">
+                <div class="section-label">Proof-of-Concept</div>
+                <h2 class="section-title">Attack Demonstration</h2>
+                <p class="section-desc">
+                    Corrupting MobileNetV2 inference with a 45 ns power glitch — no software log ever records the intrusion
+                </p>
+            </div>
+            <div class="attack-container">
+                <div class="attack-visual fade-in">
+                    <div class="attack-visual-inner">
+                        <div class="attack-step">
+                            <div class="attack-step-number">1</div>
+                            <div class="attack-step-text">
+                                <strong>Baseline Inference</strong><br>
+                                "Falcon" classification at 99% confidence
+                            </div>
+                        </div>
+                        <div class="attack-step">
+                            <div class="attack-step-number">2</div>
+                            <div class="attack-step-text">
+                                <strong>Power Glitch</strong><br>
+                                45 ns pulse via MOSFET on GPU power rail
+                            </div>
+                        </div>
+                        <div class="attack-step">
+                            <div class="attack-step-number">3</div>
+                            <div class="attack-step-text">
+                                <strong>Attack Result</strong><br>
+                                Classification flips to "Camel" at 90%
+                            </div>
+                        </div>
+                        <div class="attack-result">
+                            <div class="attack-result-label">Attack Outcome</div>
+                            <div class="attack-result-value">Falcon 99% → Camel 90%</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="attack-info fade-in">
+                    <h3>Voltage Glitching on RTX 4090</h3>
+                    <p>
+                        We demonstrate the reality and danger of physical attacks by corrupting a MobileNetV2
+                        inference with a 45 ns power glitch. The attack changes the classification — no
+                        software log ever records the intrusion.
+                    </p>
+                    <div class="code-block">
+<span class="comment"># Run attack with auto-success detection</span>
+python heatmap_glitch.py <span class="string">--gpu</span> 0 \\
+  <span class="string">--model</span> mobilenet_v2 \\
+  <span class="string">--image</span> samples/falcon.jpg \\
+  <span class="string">--trigger-port</span> /dev/ttyACM0 \\
+  <span class="string">--confidence-threshold</span> <span class="number">0.5</span>
+                    </div>
+                    <p style="font-size: 0.9rem;">
+                        <strong style="color: var(--accent);">Auto-success detection:</strong>
+                        the script registers a successful attack if post-glitch confidence falls below
+                        <code style="background: var(--bg-card); padding: 0.2rem 0.4rem; border-radius: 4px;">--confidence-threshold</code> (0.5 = 50%)
+                        or the predicted class changes.
+                    </p>
+                    <a href="#contact" class="btn btn-primary" style="margin-top: 1rem;" aria-label="Get Tech Brief">
+                        <span aria-hidden="true">📄</span> Get Tech Brief
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="repo">
+        <div class="container">
+            <div class="section-header fade-in">
+                <div class="section-label">Repository</div>
+                <h2 class="section-title">Project Structure</h2>
+            </div>
+            <div class="repo-tree fade-in">
+                <div class="tree-line">
+                    <span class="tree-icon" aria-hidden="true">📁</span>
+                    <span class="tree-folder">whitepaper/</span>
+                    <span class="tree-comment"># White Paper (PDF + LaTeX source)</span>
+                </div>
+                <div class="tree-line">
+                    <span class="tree-icon" aria-hidden="true">📁</span>
+                    <span class="tree-folder">tech_brief/</span>
+                    <span class="tree-comment"># Technical integration brief for engineers</span>
+                </div>
+                <div class="tree-line">
+                    <span class="tree-icon" aria-hidden="true">📁</span>
+                    <span class="tree-folder">poc/</span>
+                    <span class="tree-comment"># Proof-of-Concept: voltage glitching on RTX 4090</span>
+                </div>
+                <div class="tree-line tree-indent">
+                    <span class="tree-icon" aria-hidden="true">🐍</span>
+                    <span class="tree-file">heatmap_glitch.py</span>
+                    <span class="tree-comment"># GradCAM + confidence scoring + auto-success detection</span>
+                </div>
+                <div class="tree-line tree-indent">
+                    <span class="tree-icon" aria-hidden="true">📁</span>
+                    <span class="tree-folder">trigger_arty/</span>
+                    <span class="tree-comment"># Verilog source for Arty A7 PCIe-trigger</span>
+                </div>
+                <div class="tree-line tree-indent">
+                    <span class="tree-icon" aria-hidden="true">📁</span>
+                    <span class="tree-folder">docs/</span>
+                    <span class="tree-comment"># Setup instructions for the attack lab</span>
+                </div>
+                <div class="tree-line">
+                    <span class="tree-icon" aria-hidden="true">📁</span>
+                    <span class="tree-folder">fpga_shield/</span>
+                    <span class="tree-comment"># TOTAL Shield FPGA image source (TinyML detector)</span>
+                </div>
+                <div class="tree-line">
+                    <span class="tree-icon" aria-hidden="true">📁</span>
+                    <span class="tree-folder">patents/</span>
+                    <span class="tree-comment"># Provisional patent application (USPTO)</span>
+                </div>
+                <div class="tree-line">
+                    <span class="tree-icon" aria-hidden="true">📁</span>
+                    <span class="tree-folder">business/</span>
+                    <span class="tree-comment"># Business models, ROI calculator, pitch deck</span>
+                </div>
+                <div class="tree-line">
+                    <span class="tree-icon" aria-hidden="true">📄</span>
+                    <span class="tree-file">README.md</span>
+                </div>
+            </div>
+            <div class="github-link fade-in">
+                <a href="https://github.com/karamik/TOTAL-Shield/blob/main/README.md" target="_blank" rel="noopener noreferrer" aria-label="GitHub Repository">
+                    <span aria-hidden="true">🐙</span> View on GitHub
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <section id="business">
+        <div class="container">
+            <div class="section-header fade-in">
+                <div class="section-label">Business Model</div>
+                <h2 class="section-title">Market Opportunities</h2>
+                <p class="section-desc">Three segments with combined potential of $120-150M by 2028</p>
+            </div>
+            <div style="overflow-x: auto;">
+                <table class="business-table fade-in">
+                    <thead>
+                        <tr>
+                            <th>Customer</th>
+                            <th>Product</th>
+                            <th>Pricing</th>
+                            <th>Annual Potential (2028)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Chiplet/GPU Makers</strong><br><span style="color: var(--text-muted); font-size: 0.85rem;">Marvell, Broadcom, Chinese accelerators</span></td>
+                            <td>TOTAL/CRC-256B RTL (UCIe 2.0)</td>
+                            <td>$0.50 per chip + royalties</td>
+                            <td><strong style="color: var(--accent);">$25M</strong></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Cloud Operators / Sovereign AI</strong><br><span style="color: var(--text-muted); font-size: 0.85rem;">Core42, G42</span></td>
+                            <td>TOTAL Shield FPGA image + detector</td>
+                            <td>$5,000/rack or $50,000/datacenter</td>
+                            <td><strong style="color: var(--accent);">$50M</strong> <span style="color: var(--text-muted); font-size: 0.85rem;">(UAE only)</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Government / Critical Infrastructure</strong></td>
+                            <td>Integrated bundle</td>
+                            <td>Project-based</td>
+                            <td><strong style="color: var(--accent);">$10-20M</strong></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div style="text-align: center; margin-top: 2rem;">
+                <span class="revenue-highlight fade-in">💰 Total potential: $120-150M annual revenue (80%+ gross margin)</span>
+            </div>
+        </div>
+    </section>
+
+    <section id="roadmap" style="background: var(--bg-secondary);">
+        <div class="container">
+            <div class="section-header fade-in">
+                <div class="section-label">Development Plan</div>
+                <h2 class="section-title">Roadmap & Milestones</h2>
+            </div>
+            <div class="roadmap">
+                <div class="roadmap-item fade-in">
+                    <div class="roadmap-date">May 2026</div>
+                    <div class="roadmap-title">PoC Completion</div>
+                    <div class="roadmap-desc">Video demonstration of glitch attack + Shield detection</div>
+                    <div class="roadmap-partner">👤 Internal</div>
+                </div>
+                <div class="roadmap-item fade-in">
+                    <div class="roadmap-date">Q3 2026</div>
+                    <div class="roadmap-title">UAE Pilot</div>
+                    <div class="roadmap-desc">TOTAL Shield deployed in Core42 lab, validated on Falcon</div>
+                    <div class="roadmap-partner">🤝 Core42 engineering</div>
+                </div>
+                <div class="roadmap-item fade-in">
+                    <div class="roadmap-date">Q4 2026</div>
+                    <div class="roadmap-title">National Certification</div>
+                    <div class="roadmap-desc">Test suite approved by UAE AI Lab</div>
+                    <div class="roadmap-partner">🤝 UAE AI Lab, DESC</div>
+                </div>
+                <div class="roadmap-item fade-in">
+                    <div class="roadmap-date">Q1 2027</div>
+                    <div class="roadmap-title">Commercial Launch</div>
+                    <div class="roadmap-desc">"TOTAL Verified" tier in sovereign cloud; chiplet licensing begins</div>
+                    <div class="roadmap-partner">🤝 Core42, Marvell</div>
+                </div>
+                <div class="roadmap-item fade-in">
+                    <div class="roadmap-date">2027-28</div>
+                    <div class="roadmap-title">Global Expansion</div>
+                    <div class="roadmap-desc">Export to KSA, Singapore, EU; IEEE standard proposal</div>
+                    <div class="roadmap-partner">🤝 MGX, Mubadala</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="contact" class="contact-section">
+        <div class="container">
+            <div class="section-header fade-in">
+                <div class="section-label">Contact</div>
+                <h2 class="section-title">Start a Partnership</h2>
+                <p class="section-desc">Reach out for the pilot program or IP licensing</p>
+            </div>
+            
+            <a href="mailto:totalprotocol@proton.me" class="contact-email fade-in" aria-label="Email totalprotocol@proton.me">
+                <span aria-hidden="true">📧</span> totalprotocol@proton.me
+            </a>
+
+            <div class="contact-grid">
+                <div class="contact-card fade-in">
+                    <h4>📋 General Inquiries</h4>
+                    <p>Partnerships, investments, IP block licensing</p>
+                </div>
+                <div class="contact-card fade-in">
+                    <h4>🧪 Pilot Program (UAE)</h4>
+                    <p>90-day joint evaluation with Core42 / G42</p>
+                </div>
+                <div class="contact-card fade-in">
+                    <h4>🔧 Technical Support</h4>
+                    <p>FPGA, RTL, attacks and defense</p>
+                </div>
+                <div class="contact-card fade-in">
+                    <h4>📍 Office</h4>
+                    <p>TOTAL Protocol Labs<br>Masdar City Free Zone<br>Abu Dhabi, UAE</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p class="footer-quote">
+                "Data residency is not enough. <strong>Execution Integrity</strong> is the new sovereignty."
+            </p>
+            <div class="github-link" style="margin-top: 1rem;">
+                <a href="https://github.com/karamik/TOTAL-Shield/blob/main/README.md" target="_blank" rel="noopener noreferrer" aria-label="GitHub Repository">
+                    <span aria-hidden="true">🐙</span> Repository: TOTAL-Shield
+                </a>
+            </div>
+            <p class="footer-copy">
+                © 2026 TOTAL Protocol Labs. All rights reserved.
+                <span style="color: var(--text-muted);">|</span>
+                Patents pending in US and UAE.<br>
+                <span style="font-size: 0.8rem;">This site is for informational purposes. For commercial licenses contact us.</span>
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // Particles (reduced to 30 for performance)
+        const particlesContainer = document.getElementById('particles');
+        for (let i = 0; i < 30; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.top = Math.random() * 100 + '%';
+            particle.style.animationDelay = Math.random() * 15 + 's';
+            particle.style.animationDuration = (10 + Math.random() * 20) + 's';
+            particlesContainer.appendChild(particle);
+        }
+
+        const observerOptions = { threshold: 0.1, rootMargin: '0px 0px -50px 0px' };
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('visible'); });
+        }, observerOptions);
+        document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                const href = this.getAttribute('href');
+                if (href === "#" || href === "") return;
+                e.preventDefault();
+                const target = document.querySelector(href);
+                if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+        });
+
+        // Nav background on scroll
+        const nav = document.querySelector('nav');
+        window.addEventListener('scroll', () => {
+            nav.style.background = window.scrollY > 50 ? 'rgba(10, 10, 15, 0.95)' : 'rgba(10, 10, 15, 0.8)';
+        });
+
+        // Hamburger menu
+        const hamburger = document.querySelector('.hamburger');
+        const mobileMenu = document.getElementById('mobileMenu');
+        hamburger.addEventListener('click', () => {
+            const expanded = hamburger.getAttribute('aria-expanded') === 'true' ? false : true;
+            hamburger.setAttribute('aria-expanded', expanded);
+            mobileMenu.classList.toggle('open');
+        });
+        // Close mobile menu when clicking a link
+        mobileMenu.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.remove('open');
+                hamburger.setAttribute('aria-expanded', 'false');
+            });
+        });
+    </script>
+</body>
+</html>
