@@ -1,0 +1,41 @@
+# TOTAL Shield – Proprietary License with Non-Commercial Research Exceptions
+
+**Copyright © 2026 TOTAL Protocol Labs. All rights reserved.**
+
+This license applies to all files in this repository (the “Software”), including but not limited to: Verilog/VHDL source code, Python scripts, FPGA bitstreams, Tcl scripts, documentation, white papers, technical briefs, and any associated media.
+
+## 1. Grant of Rights
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of the Software, to **view, study, and modify** the Software for **non‑commercial research and educational purposes only**, subject to the following conditions:
+
+- The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+- Any modified version must be clearly marked as “Modified” and retain the original copyright notice.
+- Redistribution of the original or modified Software is permitted **only for non‑commercial purposes** (e.g., academic collaboration, internal research), provided that no fee is charged.
+
+## 2. Commercial Use Prohibited (Without Separate License)
+
+**Commercial use of the Software, in whole or in part, is strictly prohibited** without a separate commercial license agreement signed by TOTAL Protocol Labs. Commercial use includes but is not limited to:
+
+- Selling, licensing, sublicensing, or otherwise distributing the Software for a fee.
+- Incorporating the Software into a product or service that generates revenue.
+- Using the Software to provide a managed or hosted service (e.g., AI inference as a service) that is offered to third parties for compensation.
+- Using the Software as part of a hardware product (chiplet, FPGA accelerator, server rack) that is sold or leased.
+
+For commercial licensing inquiries, please contact: **totalprotocol@proton.me**
+
+## 3. No Warranty
+
+THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+## 4. Patent Rights
+
+The Software may implement methods that are the subject of pending patent applications (US and UAE). No license to any patent is granted under this agreement. Any use of the Software that would infringe patent claims requires a separate patent license.
+
+## 5. Termination
+
+Any violation of the terms above automatically terminates the rights granted in Section 1, and you must cease all use and delete all copies of the Software.
+
+---
+
+**For commercial licenses, IP block integration, or pilot programs:**  
+TOTAL Protocol Labs – totalprotocol@proton.me
