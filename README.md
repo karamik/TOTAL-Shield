@@ -288,8 +288,6 @@ For qualified partners (government, critical infrastructure, hyperscalers), we c
 
 ## Tough Questions – Executive Answers
 
-Technical auditors from Core42, DESC, or national security councils will ask these. Here are your answers.
-
 ### 1. “Why can’t we just use standard voltage sensors from Agile Analog or other vendors?”
 
 **Answer:**  
