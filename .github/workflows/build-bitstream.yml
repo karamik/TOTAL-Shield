@@ -1,0 +1,39 @@
+name: Build TOTAL Shield Bitstream with Vivado Docker
+
+on:
+  workflow_dispatch:        # только ручной запуск
+  push:
+    branches: [ main ]
+    paths:
+      - 'fpga_shield/rtl/*.v'
+      - 'fpga_shield/constraints/*.xdc'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: docker.io/ryankurte/vivado:2024.1   # публичный образ с Vivado
+      options: --user root
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Create project and generate bitstream
+        run: |
+          cd fpga_shield/synth
+          vivado -mode batch -source run_impl.tcl
+        shell: bash
+
+      - name: Collect and upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: total-shield-bitstream
+          path: fpga_shield/synth/vivado_project/*.runs/impl_1/*.bit
+          if-no-files-found: error
+
+      - name: Upload LTX file if exists
+        uses: actions/upload-artifact@v4
+        with:
+          name: total-shield-debug
+          path: fpga_shield/synth/vivado_project/*.runs/impl_1/*.ltx
+          if-no-files-found: warn
